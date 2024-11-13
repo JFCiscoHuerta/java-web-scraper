@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        WebScrapper webScrapper = new WebScrapper("https://jsoup.org/cookbook/introduction/parsing-a-document");
+        WebScrapper webScrapper = new WebScrapper("your-web-page-link");
 
         if (webScrapper.testConnection()) {
             Elements elements = webScrapper.scrapeLinks();
