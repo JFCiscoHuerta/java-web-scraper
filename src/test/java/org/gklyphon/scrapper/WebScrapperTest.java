@@ -6,6 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -112,10 +116,52 @@ class WebScrapperTest {
      * Ensures that scrapeSpecificElements() throws a RuntimeException when an error occurs.
      */
     @Test
-    void scrapeSpecificElements_shouldThrowsRuntimeException_whenScrapeSpecificElementsCalled() {
+    void scrapeSpecificElements_shouldThrowsRuntimeException_whenScrapeSpecificElementsFails() {
         doThrow(RuntimeException.class).when(scrapper).scrapeSpecificElements(anyString());
         assertThrows(RuntimeException.class, ()-> scrapper.scrapeSpecificElements("h1 h2"));
         verify(scrapper).scrapeSpecificElements(anyString());
+    }
+
+    /**
+     * Verifies that saveElementsToFile() throws a RuntimeException when an error occurs while attempting to save elements to a file.
+     */
+    @Test
+    void saveElementsToFile_shouldThrowRuntimeException_whenSaveElementsToFileFail() {
+        doThrow(RuntimeException.class).when(scrapper).saveElementsToFile(anyString(), any(Elements.class));
+        assertThrows(RuntimeException.class, ()-> scrapper.saveElementsToFile("", Data.ELEMENTS));
+        verify(scrapper).saveElementsToFile(anyString(), any());
+    }
+
+    /**
+     * Verifies that saveElementsToFile() successfully creates a file and saves the specified elements within it.
+     * The test asserts that the file is created and contains the expected content.
+     * If the file already exists, it is deleted before the test runs.
+     * Additionally, the test confirms that no exceptions are thrown when reading from the file.
+     */
+    @Test
+    void saveElementsToFile_shouldSaveFile_whenSaveElementsCalled() {
+        String filePath = "testOutput.txt";
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+        WebScrapper scrapper = new WebScrapper();
+
+        scrapper.saveElementsToFile(filePath, Data.ELEMENTS);
+
+        File testFile = new File(filePath);
+        assertTrue(testFile.exists());
+
+        assertDoesNotThrow(() -> {
+            try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+                assertEquals("<h1>Header 1</h1>, Header 1", reader.readLine());
+                assertEquals("<h2>Header 2</h2>, Header 2", reader.readLine());
+            }
+        });
+
+        if (file.exists()) {
+            file.delete();
+        }
     }
 
 }
