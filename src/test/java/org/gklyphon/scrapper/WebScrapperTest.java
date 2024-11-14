@@ -1,6 +1,5 @@
 package org.gklyphon.scrapper;
 
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,10 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -19,11 +15,6 @@ class WebScrapperTest {
 
     @Mock
     WebScrapper scrapper;
-
-    @BeforeEach
-    void setUp() {
-        scrapper.setPageUrl("www.google.com");
-    }
 
     @Test
     void testConnection_shouldReturnTrue_whenTestConnectionCalled() {
@@ -54,9 +45,8 @@ class WebScrapperTest {
     }
 
     @Test
-    void scrapeTitles_shouldThrowsIOException_whenScrapeTitlesFails() {
+    void scrapeTitles_shouldThrowsRuntimeException_whenScrapeTitlesFails() {
         doThrow(RuntimeException.class).when(scrapper).scrapeTitles();
-        //when(scrapper.scrapeTitles()).thenReturn(Data.ELEMENTS);
         assertThrows(RuntimeException.class, ()->scrapper.scrapeTitles());
         verify(scrapper).scrapeTitles();
     }
@@ -69,5 +59,27 @@ class WebScrapperTest {
         verify(scrapper).scrapeLinks();
     }
 
+    @Test
+    void scrapeLinks_shouldThrowsIOException_whenScrapeLinksFails() {
+        doThrow(RuntimeException.class).when(scrapper).scrapeLinks();
+        assertThrows(RuntimeException.class, ()->scrapper.scrapeLinks());
+        verify(scrapper).scrapeLinks();
+    }
+
+    @Test
+    void scrapeSpecificElements_shouldReturnElements_whenScrapeSpecificElementsCalled() {
+        when(scrapper.scrapeSpecificElements(anyString())).thenReturn(Data.ELEMENTS);
+        Elements elements = scrapper.scrapeSpecificElements("h1, h2");
+        assertFalse(elements.isEmpty());
+        assertEquals("Header 1 Header 2", elements.text());
+        verify(scrapper).scrapeSpecificElements(anyString());
+    }
+
+    @Test
+    void scrapeSpecificElements_shouldThrowsRuntimeException_whenScrapeSpecificElementsCalled() {
+        doThrow(RuntimeException.class).when(scrapper).scrapeSpecificElements(anyString());
+        assertThrows(RuntimeException.class, ()-> scrapper.scrapeSpecificElements("h1 h2"));
+        verify(scrapper).scrapeSpecificElements(anyString());
+    }
 
 }
