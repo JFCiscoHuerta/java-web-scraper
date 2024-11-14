@@ -27,6 +27,10 @@ public class WebScrapper {
     private String userAgent = null;
     private String pageUrl = null;
 
+
+    public WebScrapper() {
+    }
+
     /**
      * Constructor to initialize the WebScrapper with the target page URL.
      * It uses a default user agent string if no user agent is provided.
@@ -169,4 +173,19 @@ public class WebScrapper {
         }
     }
 
+    public String getPageUrl() {
+        return pageUrl;
+    }
+
+    public void setPageUrl(String pageUrl) {
+        this.pageUrl = pageUrl;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
 }
